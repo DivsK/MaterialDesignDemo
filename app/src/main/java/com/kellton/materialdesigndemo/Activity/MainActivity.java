@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -29,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kellton.materialdesigndemo.Adapters.RecyclerViewAdapter;
+import com.kellton.materialdesigndemo.Fragment.ItemListDialogFragment;
 import com.kellton.materialdesigndemo.R;
 
 
@@ -39,13 +41,15 @@ import com.kellton.materialdesigndemo.R;
  * @author Divya Khanduri
  */
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener,ItemListDialogFragment.Listener {
     private DrawerLayout drawerLayout;
     private int[] myDataset = {R.drawable.md1, R.drawable.md2, R.drawable.md3, R.drawable.md4, R.drawable.md5, R.drawable.md6, R.drawable.md7};
+    private int[] myBtmDataset = {R.drawable.sm1, R.drawable.sm2, R.drawable.sm3, R.drawable.sm4};
     private String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
     private RippleDrawable rippleDrawable;
     private CoordinatorLayout mCoordinatorLayout;
+    private BottomSheetBehavior mBottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +70,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.containerLayout);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View bottomSheet = findViewById(R.id.bottom_sheet1);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
 
@@ -148,11 +156,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 showCustomSnackbar();
                 break;
             }
-            case R.id.view: {
+            case R.id.persistent_bottomsheet: {
+                if(mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+                else {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
                 break;
             }
             case R.id.tabs: {
                 startActivity(new Intent(MainActivity.this, TabActivity.class));
+                break;
+            }
+            case R.id.model_bottomsheet: {
+                ItemListDialogFragment itemListDialogFragment=ItemListDialogFragment.newInstance(myBtmDataset);
+                itemListDialogFragment.show(getSupportFragmentManager(),"Model BottomSheet");
                 break;
             }
             default:
@@ -184,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         imageView.setImageBitmap(image);
         TextView textViewTop = snackView.findViewById(R.id.tv_snackbar);
         textViewTop.setText(getString(R.string.have_a_bite));
-        textViewTop.setTextColor(Color.CYAN);
+        textViewTop.setTextColor(Color.BLACK);
 
         // Add the view to the Snackbar's layout
         layout.addView(snackView, 0);
@@ -202,5 +221,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         return false;
+    }
+
+    @Override
+    public void onItemClicked(int position) {
+
     }
 }
